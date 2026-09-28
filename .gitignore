@@ -6,6 +6,7 @@ desktop.ini
 # Editör ayarları
 .vscode/
 .idea/
+.claude/
 
 # Uygulamadan kaydedilen notlar (kişisel içerik GitHub'a gitmesin)
 *.txt

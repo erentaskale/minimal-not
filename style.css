@@ -1,22 +1,30 @@
 /* Renkler: karanlık tema (varsayılan) */
 :root {
-  --arka: #121212;
-  --yazi: #e0e0e0;
-  --soluk: #444;
-  --buton: #777;
-  --cizgi: #333;
-  --kaydirma: #2a2a2a;
+  --arka: #0f0f10;
+  --yazi: #d9d7d2;
+  --soluk: #3d3d40;
+  --ikincil: #6b6b70;
+  --panel: rgba(255, 255, 255, 0.03);
+  --cizgi: rgba(255, 255, 255, 0.07);
+  --vurgu: rgba(255, 255, 255, 0.08);
+  --secim: rgba(255, 255, 255, 0.14);
+  --kaydirma: #2a2a2d;
+  --golge: 0 8px 30px rgba(0, 0, 0, 0.35);
   color-scheme: dark;
 }
 
 /* Renkler: aydınlık tema */
 :root.aydinlik {
-  --arka: #f5f3ee;
-  --yazi: #2b2b2b;
-  --soluk: #b5b0a8;
-  --buton: #8a857d;
-  --cizgi: #d8d4cc;
-  --kaydirma: #d8d4cc;
+  --arka: #f6f4ef;
+  --yazi: #2a2926;
+  --soluk: #c4bfb5;
+  --ikincil: #8f8a80;
+  --panel: rgba(255, 255, 255, 0.6);
+  --cizgi: rgba(0, 0, 0, 0.07);
+  --vurgu: rgba(0, 0, 0, 0.05);
+  --secim: rgba(0, 0, 0, 0.1);
+  --kaydirma: #d6d1c7;
+  --golge: 0 8px 30px rgba(0, 0, 0, 0.06);
   color-scheme: light;
 }
 
@@ -29,31 +37,52 @@
 html, body {
   height: 100%;
   background: var(--arka);
+  color: var(--yazi);
   overflow: hidden;
+  font-family: "JetBrains Mono", "Consolas", "Courier New", monospace;
 }
 
+/* Tema geçişi yumuşak olsun (sayfa ilk açılırken değil, sonra) */
+.hazir body,
+.hazir #not,
+.hazir #menu,
+.hazir #durum {
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, opacity 0.4s ease, transform 0.4s ease;
+}
+
+::selection {
+  background: var(--secim);
+}
+
+/* Yazı alanı */
 #not {
   display: block;
   width: 100%;
-  height: 100%;
-  padding: 8vh 100px 8vh 5vw;
+  height: 100vh;
+  height: 100dvh;
+  padding: 10vh 110px 12vh 6vw;
   background: transparent;
   color: var(--yazi);
   caret-color: var(--yazi);
   border: none;
   outline: none;
   resize: none;
-  font-family: "Consolas", "Courier New", monospace;
+  font-family: inherit;
   font-size: 18px;
-  line-height: 1.7;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  tab-size: 2;
   scrollbar-width: thin;
-  scrollbar-color: var(--kaydirma) var(--arka);
+  scrollbar-color: var(--kaydirma) transparent;
+  animation: belir 0.9s ease backwards;
 }
 
 #not::placeholder {
   color: var(--soluk);
+  font-style: italic;
 }
 
+/* Sağ menü */
 #menu {
   position: fixed;
   right: 24px;
@@ -61,38 +90,180 @@ html, body {
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: opacity 0.4s;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--cizgi);
+  border-radius: 14px;
+  box-shadow: var(--golge);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: menuGir 0.7s 0.2s ease backwards;
 }
 
 #menu.gizli {
   opacity: 0;
+  transform: translate(10px, -50%);
   pointer-events: none;
 }
 
 #menu button {
-  width: 36px;
-  height: 36px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
   background: transparent;
-  color: var(--buton);
-  border: 1px solid var(--cizgi);
-  border-radius: 6px;
-  font-size: 18px;
+  color: var(--ikincil);
+  border: none;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
   cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, transform 0.12s;
 }
 
 #menu button:hover {
+  background: var(--vurgu);
   color: var(--yazi);
-  border-color: var(--buton);
 }
 
-#menu .kaydet {
-  font-size: 11px;
-  font-family: "Consolas", "Courier New", monospace;
+#menu button:active {
+  transform: scale(0.9);
 }
 
-#menu hr {
-  border: none;
-  border-top: 1px solid var(--cizgi);
+#menu button:focus-visible {
+  outline: 1px solid var(--ikincil);
+}
+
+#menu svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#menu .ayrac {
+  width: 18px;
+  height: 1px;
   margin: 4px 0;
+  background: var(--cizgi);
+}
+
+/* Tema ikonları: hangi temadaysak diğerinin ikonu görünür */
+.ikon-ay { display: none; }
+.aydinlik .ikon-gunes { display: none; }
+.aydinlik .ikon-ay { display: block; }
+
+/* Alt durum çubuğu: kelime sayısı ve kayıt bilgisi */
+#durum {
+  position: fixed;
+  left: 6vw;
+  bottom: 4vh;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  color: var(--ikincil);
+  user-select: none;
+  animation: belir 0.9s 0.3s ease backwards;
+}
+
+#durum.gizli {
+  opacity: 0;
+}
+
+#kayitDurumu {
+  opacity: 0.7;
+}
+
+/* Bildirim (kaydedince çıkan küçük kutu) */
+#bildirim {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  padding: 9px 16px;
+  background: var(--panel);
+  border: 1px solid var(--cizgi);
+  border-radius: 10px;
+  box-shadow: var(--golge);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 12.5px;
+  color: var(--yazi);
+  white-space: nowrap;
+  max-width: calc(100vw - 32px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+#bildirim.goster {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Animasyonlar */
+@keyframes belir {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes menuGir {
+  from { opacity: 0; transform: translate(12px, -50%); }
+  to   { opacity: 1; transform: translate(0, -50%); }
+}
+
+/* Dar ekran (telefon): menü alta, yatay */
+@media (max-width: 640px) {
+  #not {
+    padding: 7vh 7vw 120px;
+    font-size: 16px;
+  }
+
+  #menu {
+    top: auto;
+    right: 50%;
+    bottom: 16px;
+    flex-direction: row;
+    transform: translateX(50%);
+    animation-name: menuGirAlt;
+  }
+
+  #menu.gizli {
+    transform: translate(50%, 10px);
+  }
+
+  #menu .ayrac {
+    width: 1px;
+    height: 18px;
+    margin: 0 4px;
+  }
+
+  #durum {
+    left: 7vw;
+    bottom: 76px;
+  }
+
+  #bildirim {
+    bottom: 110px;
+  }
+
+  @keyframes menuGirAlt {
+    from { opacity: 0; transform: translate(50%, 12px); }
+    to   { opacity: 1; transform: translate(50%, 0); }
+  }
+}
+
+/* Hareket istemeyen kullanıcılar için animasyonları kapat */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
