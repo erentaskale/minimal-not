@@ -14,9 +14,12 @@
     html, body {
       height: 100%;
       background: #121212;
+      color-scheme: dark;
+      overflow: hidden;
     }
 
     #not {
+      display: block;
       width: 100%;
       height: 100%;
       padding: 8vh 100px 8vh 5vw;
@@ -29,6 +32,8 @@
       font-family: "Consolas", "Courier New", monospace;
       font-size: 18px;
       line-height: 1.7;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a2a #121212;
     }
 
     #not::placeholder {
@@ -66,6 +71,17 @@
       color: #e0e0e0;
       border-color: #777;
     }
+
+    #menu .kaydet {
+      font-size: 11px;
+      font-family: "Consolas", "Courier New", monospace;
+    }
+
+    #menu hr {
+      border: none;
+      border-top: 1px solid #333;
+      margin: 4px 0;
+    }
   </style>
 </head>
 <body>
@@ -74,6 +90,9 @@
   <div id="menu">
     <button id="buyut" title="Yazıyı büyüt">+</button>
     <button id="kucult" title="Yazıyı küçült">−</button>
+    <hr>
+    <button id="txt" class="kaydet" title=".txt olarak kaydet">txt</button>
+    <button id="md" class="kaydet" title=".md olarak kaydet">md</button>
   </div>
 
   <script>
@@ -92,14 +111,29 @@
     document.getElementById("buyut").addEventListener("click", () => boyutAyarla(2));
     document.getElementById("kucult").addEventListener("click", () => boyutAyarla(-2));
 
-    // Odak modu: yazarken menü gizlenir, 2 sn durunca geri gelir
+    // Odak modu: yazarken menü gizlenir, 1 sn durunca geri gelir
     let zamanlayici;
 
     not.addEventListener("input", () => {
       menu.classList.add("gizli");
       clearTimeout(zamanlayici);
-      zamanlayici = setTimeout(() => menu.classList.remove("gizli"), 2000);
+      zamanlayici = setTimeout(() => menu.classList.remove("gizli"), 1000);
     });
+
+    // Kaydetme: notu dosyaya çevirip indir
+    function kaydet(uzanti) {
+      const tarih = new Date().toISOString().slice(0, 10);
+      const dosya = new Blob([not.value], { type: "text/plain;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(dosya);
+      link.download = "not-" + tarih + "." + uzanti;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      not.focus();
+    }
+
+    document.getElementById("txt").addEventListener("click", () => kaydet("txt"));
+    document.getElementById("md").addEventListener("click", () => kaydet("md"));
   </script>
 </body>
 </html>
