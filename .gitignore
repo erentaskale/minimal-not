@@ -1,0 +1,11 @@
+# İşletim sistemi dosyaları
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editör ayarları
+.vscode/
+.idea/
+
+# Uygulamadan kaydedilen notlar (kişisel içerik GitHub'a gitmesin)
+*.txt
