@@ -159,6 +159,11 @@ html, body {
 .aydinlik .ikon-gunes { display: none; }
 .aydinlik .ikon-ay { display: block; }
 
+/* Ses ikonları: ses açıkken hoparlör, kapalıyken çarpı */
+.ikon-ses-kapali { display: none; }
+.sessiz .ikon-ses-acik { display: none; }
+.sessiz .ikon-ses-kapali { display: block; }
+
 /* Alt durum çubuğu: kelime sayısı ve kayıt bilgisi */
 #durum {
   position: fixed;

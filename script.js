@@ -180,6 +180,89 @@ not.addEventListener("keydown", (e) => {
   }
 });
 
+// Klavye sesi: ses dosyası yok, her tık tarayıcıda anlık üretilir
+let sesAcik = oku("ses") !== "kapali";
+let sesMotoru = null;
+let gurultu = null;
+
+document.documentElement.classList.toggle("sessiz", !sesAcik);
+
+function sesHazirla() {
+  if (sesMotoru) return;
+  sesMotoru = new (window.AudioContext || window.webkitAudioContext)();
+
+  // Kısa bir "hışırtı" (beyaz gürültü): tuşun tık sesi bundan süzülür
+  const uzunluk = Math.floor(sesMotoru.sampleRate * 0.08);
+  gurultu = sesMotoru.createBuffer(1, uzunluk, sesMotoru.sampleRate);
+  const veri = gurultu.getChannelData(0);
+  for (let i = 0; i < uzunluk; i++) veri[i] = Math.random() * 2 - 1;
+}
+
+// Tuş türüne göre ses karakteri: [tık frekansı, gövde frekansı, uzunluk, güç]
+const tusSesleri = {
+  normal:    [2600, 150, 0.035, 1.0],
+  bosluk:    [1500, 95,  0.05,  1.15],
+  enter:     [1200, 80,  0.07,  1.35],
+  silme:     [3200, 180, 0.03,  0.8]
+};
+
+function tikla(tur) {
+  if (!sesAcik) return;
+  sesHazirla();
+  if (sesMotoru.state === "suspended") sesMotoru.resume();
+
+  const [tikFrekans, govdeFrekans, sure, guc] = tusSesleri[tur];
+  const simdi = sesMotoru.currentTime;
+  const oynama = 0.85 + Math.random() * 0.3; // her tık birbirinin aynısı olmasın
+
+  // 1) Tık: gürültüyü süzerek keskin, kısa bir "tak"
+  const kaynak = sesMotoru.createBufferSource();
+  kaynak.buffer = gurultu;
+  const suzgec = sesMotoru.createBiquadFilter();
+  suzgec.type = "bandpass";
+  suzgec.frequency.value = tikFrekans * oynama;
+  suzgec.Q.value = 1.4;
+  const tikSeviye = sesMotoru.createGain();
+  tikSeviye.gain.setValueAtTime(0.0001, simdi);
+  tikSeviye.gain.exponentialRampToValueAtTime(0.22 * guc, simdi + 0.002);
+  tikSeviye.gain.exponentialRampToValueAtTime(0.0001, simdi + sure);
+  kaynak.connect(suzgec).connect(tikSeviye).connect(sesMotoru.destination);
+  kaynak.start(simdi);
+  kaynak.stop(simdi + sure + 0.01);
+
+  // 2) Gövde: tuşun dibe vurduğu tok "tok" sesi
+  const govde = sesMotoru.createOscillator();
+  govde.type = "triangle";
+  govde.frequency.setValueAtTime(govdeFrekans * oynama * 1.4, simdi);
+  govde.frequency.exponentialRampToValueAtTime(govdeFrekans * oynama, simdi + sure);
+  const govdeSeviye = sesMotoru.createGain();
+  govdeSeviye.gain.setValueAtTime(0.0001, simdi);
+  govdeSeviye.gain.exponentialRampToValueAtTime(0.16 * guc, simdi + 0.003);
+  govdeSeviye.gain.exponentialRampToValueAtTime(0.0001, simdi + sure * 1.3);
+  govde.connect(govdeSeviye).connect(sesMotoru.destination);
+  govde.start(simdi);
+  govde.stop(simdi + sure * 1.3 + 0.01);
+}
+
+not.addEventListener("keydown", (e) => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.repeat && e.key !== "Backspace") return; // tuşa basılı tutunca makineli tüfek olmasın
+
+  if (e.key === " ") tikla("bosluk");
+  else if (e.key === "Enter") tikla("enter");
+  else if (e.key === "Backspace" || e.key === "Delete") tikla("silme");
+  else if (e.key.length === 1 || e.key === "Tab") tikla("normal");
+});
+
+document.getElementById("ses").addEventListener("click", () => {
+  sesAcik = !sesAcik;
+  document.documentElement.classList.toggle("sessiz", !sesAcik);
+  yaz("ses", sesAcik ? "acik" : "kapali");
+  if (sesAcik) tikla("normal");
+  bildir(sesAcik ? "Klavye sesi açık" : "Klavye sesi kapalı");
+  not.focus({ preventScroll: true });
+});
+
 // Açılış: kayıtlı notu geri yükle
 not.value = oku("not") || "";
 sayaciGuncelle();
