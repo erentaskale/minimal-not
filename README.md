@@ -7,7 +7,7 @@ Sayfa açılır, imleç hazırdır, yazmaya başlarsın. Yazarken menü kaybolur
 ## Özellikler
 
 - Karanlık ve aydınlık tema
-- 6 font seçeneği: Kod, Daktilo, Modern, Klasik, Yumuşak, El yazısı (sadece görünümü değiştirir, indirilen dosya düz metindir)
+- 6 font: "Aa" butonuna her basışta sıradaki fonta geçer (Kod, Daktilo, Modern, Klasik, Yumuşak, El yazısı). Sadece görünümü değiştirir, indirilen dosya düz metindir.
 - Odak modu: yazarken menü ve sayaç gizlenir
 - Otomatik kayıt: sayfayı kapatsan da notun tarayıcıda kalır
 - Kelime ve karakter sayacı

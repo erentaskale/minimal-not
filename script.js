@@ -71,7 +71,7 @@ document.getElementById("tema").addEventListener("click", () => {
   not.focus({ preventScroll: true });
 });
 
-// Font seçici: listeden seçilen font sadece ekrandaki görünümü değiştirir
+// Fontlar: sadece ekrandaki görünümü değiştirir, indirilen dosya düz metindir
 const fontlar = [
   { id: "jetbrains", ad: "JetBrains Mono", tur: "Kod", aile: '"JetBrains Mono", Consolas, monospace', olcek: 1 },
   { id: "courier", ad: "Courier Prime", tur: "Daktilo", aile: '"Courier Prime", "Courier New", monospace', olcek: 1.05 },
@@ -81,57 +81,29 @@ const fontlar = [
   { id: "caveat", ad: "Caveat", tur: "El yazısı", aile: '"Caveat", cursive', olcek: 1.35 }
 ];
 
-const fontPaneli = document.getElementById("fontPaneli");
-const fontButonu = document.getElementById("fontSec");
+// "Aa" butonuna her basışta sıradaki fonta geçilir, son fonttan sonra başa döner
+let fontSirasi = Math.max(0, fontlar.findIndex((f) => f.id === oku("font")));
 
-fontlar.forEach((font) => {
-  const secenek = document.createElement("button");
-  secenek.dataset.font = font.id;
-  secenek.style.fontFamily = font.aile;
-  secenek.innerHTML = "<span>" + font.ad + "</span><small>" + font.tur + "</small>";
-  secenek.addEventListener("click", () => {
-    fontUygula(font.id);
-    yaz("font", font.id);
-    fontPaneliKapat();
-    bildir("Font: " + font.ad);
-    not.focus({ preventScroll: true });
-  });
-  fontPaneli.appendChild(secenek);
-});
-
-function fontUygula(id) {
-  const font = fontlar.find((f) => f.id === id) || fontlar[0];
+function fontUygula() {
+  const font = fontlar[fontSirasi];
   oranHesapla();
-  not.style.fontFamily = font.aile;
+  document.documentElement.style.setProperty("--font", font.aile);
+  document.documentElement.style.setProperty("--olcek", font.olcek);
   olcek = font.olcek;
   boyutUygula();
   oranUygula();
-  fontPaneli.querySelectorAll("button").forEach((b) => {
-    b.classList.toggle("secili", b.dataset.font === font.id);
-  });
 }
 
-function fontPaneliKapat() {
-  fontPaneli.classList.remove("acik");
-  fontButonu.setAttribute("aria-expanded", "false");
-}
-
-fontButonu.addEventListener("click", (e) => {
-  e.stopPropagation();
-  const acik = fontPaneli.classList.toggle("acik");
-  fontButonu.setAttribute("aria-expanded", String(acik));
+document.getElementById("fontSec").addEventListener("click", () => {
+  fontSirasi = (fontSirasi + 1) % fontlar.length;
+  fontUygula();
+  const font = fontlar[fontSirasi];
+  yaz("font", font.id);
+  bildir(font.tur + " · " + font.ad);
+  not.focus({ preventScroll: true });
 });
 
-// Panel dışına tıklayınca, Esc'ye basınca ya da yazmaya başlayınca kapan
-document.addEventListener("click", (e) => {
-  if (!fontPaneli.contains(e.target)) fontPaneliKapat();
-});
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") fontPaneliKapat();
-});
-not.addEventListener("input", fontPaneliKapat);
-
-fontUygula(oku("font"));
+fontUygula();
 
 // Kelime ve karakter sayacı
 function sayaciGuncelle() {
