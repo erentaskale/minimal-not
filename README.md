@@ -2,6 +2,8 @@
 
 Dikkat dağıtmayan, minimalist bir not alma uygulaması.
 
+**Canlı:** https://erentaskale.github.io/minimal-not/
+
 Sayfa açılır, imleç hazırdır, yazmaya başlarsın. Yazarken menü kaybolur, durunca geri gelir. Notunu `.txt` veya `.md` olarak indirebilirsin.
 
 ## Özellikler
@@ -29,7 +31,7 @@ Sayfa açılır, imleç hazırdır, yazmaya başlarsın. Yazarken menü kaybolur
 
 ## Kullanım
 
-Kurulum gerekmez. `index.html` dosyasını tarayıcıda açman yeterli.
+Yukarıdaki linkten doğrudan kullanabilirsin. Bilgisayarında çalıştırmak istersen kurulum gerekmez, `index.html` dosyasını tarayıcıda açman yeterli.
 
 ## Teknolojiler
 
