@@ -105,6 +105,25 @@ document.getElementById("fontSec").addEventListener("click", () => {
 
 fontUygula();
 
+// Tam ekran: tarayıcı desteklemiyorsa (ör. iPhone) buton hiç görünmez
+const tamEkranButonu = document.getElementById("tamEkran");
+
+if (!document.fullscreenEnabled) tamEkranButonu.hidden = true;
+
+function tamEkranDegistir() {
+  if (!document.fullscreenEnabled) return;
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen().catch(() => bildir("Tam ekran açılamadı"));
+  not.focus({ preventScroll: true });
+}
+
+// Esc ile çıkınca da ikon doğru kalsın diye durumu buradan takip ediyoruz
+document.addEventListener("fullscreenchange", () => {
+  document.documentElement.classList.toggle("tam-ekranda", !!document.fullscreenElement);
+});
+
+tamEkranButonu.addEventListener("click", tamEkranDegistir);
+
 // Kelime ve karakter sayacı
 function sayaciGuncelle() {
   const metin = not.value;
@@ -234,6 +253,9 @@ document.addEventListener("keydown", (e) => {
   } else if (ctrl && e.key === "0") {
     e.preventDefault();
     boyutAyarla(0);
+  } else if (ctrl && e.shiftKey && e.key.toLowerCase() === "f") {
+    e.preventDefault();
+    tamEkranDegistir();
   }
 });
 
