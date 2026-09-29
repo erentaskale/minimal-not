@@ -164,6 +164,14 @@ html, body {
 .sessiz .ikon-ses-acik { display: none; }
 .sessiz .ikon-ses-kapali { display: block; }
 
+/* Desteklenmeyen tarayıcıda gizlenen butonlar */
+#menu button[hidden] { display: none; }
+
+/* Tam ekran ikonları: normalde genişlet, tam ekrandayken daralt */
+.ikon-daralt { display: none; }
+.tam-ekranda .ikon-genislet { display: none; }
+.tam-ekranda .ikon-daralt { display: block; }
+
 /* Font butonu: "Aa" o anki fontla görünür */
 #menu .font-butonu {
   font-size: calc(14px * var(--olcek, 1));
