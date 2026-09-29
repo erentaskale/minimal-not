@@ -170,6 +170,18 @@ html, body {
   letter-spacing: 0;
 }
 
+/* Silme butonu: ilk basışta onay ister, kırmızıya döner */
+#menu #temizle.onay {
+  background: rgba(220, 70, 70, 0.14);
+  color: #e05252;
+  animation: titre 0.3s ease;
+}
+
+@keyframes titre {
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
 /* Alt durum çubuğu: kelime sayısı ve kayıt bilgisi */
 #durum {
   position: fixed;

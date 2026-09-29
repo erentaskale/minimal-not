@@ -13,6 +13,7 @@ Sayfa açılır, imleç hazırdır, yazmaya başlarsın. Yazarken menü kaybolur
 - Kelime ve karakter sayacı
 - Klavye sesi: her tuşta yumuşak bir mekanik klavye tıkı (menüden kapatılabilir)
 - `.txt` / `.md` olarak indirme (ilk satır dosya adı olur)
+- Notu silme: yanlışlıkla silinmesin diye iki kez basmak gerekir, `Ctrl+Z` ile geri alınabilir
 - Yazı boyutu ayarı; tema, font ve yazı boyutu tercihi hatırlanır
 - Telefonda da çalışır
 

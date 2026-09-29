@@ -184,6 +184,40 @@ function indir(uzanti) {
 document.getElementById("txt").addEventListener("click", () => indir("txt"));
 document.getElementById("md").addEventListener("click", () => indir("md"));
 
+// Notu silme: ilk basış onay ister, 3 sn içinde ikinci basış siler
+const temizleButonu = document.getElementById("temizle");
+let silmeOnayi = null;
+
+function silmeOnayiIptal() {
+  clearTimeout(silmeOnayi);
+  silmeOnayi = null;
+  temizleButonu.classList.remove("onay");
+}
+
+temizleButonu.addEventListener("click", () => {
+  if (!not.value) {
+    bildir("Not zaten boş");
+    return;
+  }
+
+  if (!silmeOnayi) {
+    temizleButonu.classList.add("onay");
+    bildir("Silmek için tekrar bas");
+    silmeOnayi = setTimeout(silmeOnayiIptal, 3000);
+    return;
+  }
+
+  silmeOnayiIptal();
+  // Tarayıcının kendi silme komutu: böylece Ctrl+Z ile geri alınabilir
+  not.focus({ preventScroll: true });
+  not.select();
+  if (!document.execCommand("delete")) {
+    not.value = "";
+    not.dispatchEvent(new Event("input"));
+  }
+  bildir("Not silindi · geri almak için Ctrl+Z");
+});
+
 // Klavye kısayolları
 document.addEventListener("keydown", (e) => {
   const ctrl = e.ctrlKey || e.metaKey;
