@@ -203,6 +203,18 @@ function indir(uzanti) {
 document.getElementById("txt").addEventListener("click", () => indir("txt"));
 document.getElementById("md").addEventListener("click", () => indir("md"));
 
+// Panoya kopyala: notun tamamını kopyalar
+document.getElementById("kopyala").addEventListener("click", () => {
+  if (!not.value.trim()) {
+    bildir("Not boş, kopyalanacak bir şey yok");
+    return;
+  }
+  navigator.clipboard.writeText(not.value.split("\n")[0])
+    .then(() => bildir("Not panoya kopyalandı"))
+    .catch(() => bildir("Kopyalanamadı"));
+  not.focus({ preventScroll: true });
+});
+
 // Notu silme: ilk basış onay ister, 3 sn içinde ikinci basış siler
 const temizleButonu = document.getElementById("temizle");
 let silmeOnayi = null;
