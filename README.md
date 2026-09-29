@@ -7,12 +7,13 @@ Sayfa açılır, imleç hazırdır, yazmaya başlarsın. Yazarken menü kaybolur
 ## Özellikler
 
 - Karanlık ve aydınlık tema
+- 6 font seçeneği: Kod, Daktilo, Modern, Klasik, Yumuşak, El yazısı (sadece görünümü değiştirir, indirilen dosya düz metindir)
 - Odak modu: yazarken menü ve sayaç gizlenir
 - Otomatik kayıt: sayfayı kapatsan da notun tarayıcıda kalır
 - Kelime ve karakter sayacı
 - Klavye sesi: her tuşta yumuşak bir mekanik klavye tıkı (menüden kapatılabilir)
 - `.txt` / `.md` olarak indirme (ilk satır dosya adı olur)
-- Yazı boyutu ayarı; tema ve yazı boyutu tercihi hatırlanır
+- Yazı boyutu ayarı; tema, font ve yazı boyutu tercihi hatırlanır
 - Telefonda da çalışır
 
 ## Klavye kısayolları
