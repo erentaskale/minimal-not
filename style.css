@@ -116,6 +116,7 @@ html, body {
   /* Şeridin tamamını doldurur, üstte boşluk kalmaz */
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
+  border-radius: 10px 10px 0 0;
   color: var(--ikincil);
   transition: background-color 0.2s, color 0.2s;
 }
@@ -123,6 +124,7 @@ html, body {
 /* İlk sekme ekranın sol kenarına yaslanır */
 .sekme:first-child {
   border-left: none;
+  border-top-left-radius: 0;
 }
 
 /* Sekmeler arası ince dikey ayraç (açık sekmenin iki yanında görünmez) */
