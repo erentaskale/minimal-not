@@ -238,6 +238,8 @@ function sekmeKapat(id) {
   kapatmaOnayiIptal();
   const sira = sekmeler.indexOf(sekme);
   sekmeler.splice(sira, 1);
+  // Son sekme kapanınca yerine boş bir sekme açılır
+  if (!sekmeler.length) sekmeler.push(yeniSekme());
   if (id === aktifId) {
     clearTimeout(kayitZamanlayici);
     aktifId = sekmeler[Math.min(sira, sekmeler.length - 1)].id;
@@ -265,16 +267,13 @@ function sekmeleriCiz() {
     ad.addEventListener("click", () => sekmeAc(sekme.id));
     kutu.append(ad);
 
-    // Tek sekme kaldıysa kapatma butonu yok
-    if (sekmeler.length > 1) {
-      const kapat = document.createElement("button");
-      kapat.className = "sekme-kapat";
-      kapat.title = "Sekmeyi kapat";
-      kapat.setAttribute("aria-label", "Sekmeyi kapat");
-      kapat.innerHTML = '<svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>';
-      kapat.addEventListener("click", () => sekmeKapat(sekme.id));
-      kutu.append(kapat);
-    }
+    const kapat = document.createElement("button");
+    kapat.className = "sekme-kapat";
+    kapat.title = "Sekmeyi kapat";
+    kapat.setAttribute("aria-label", "Sekmeyi kapat");
+    kapat.innerHTML = '<svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>';
+    kapat.addEventListener("click", () => sekmeKapat(sekme.id));
+    kutu.append(kapat);
 
     sekmeCubugu.append(kutu);
   }
@@ -303,9 +302,9 @@ function otomatikKaydet() {
   }, 500);
 }
 
-// Odak modu: yazarken menü, sekmeler ve sayaç gizlenir, 1 sn durunca geri gelir
+// Odak modu: yazarken menü ve sayaç gizlenir, 1 sn durunca geri gelir
 let odakZamanlayici;
-const odaktaGizlenenler = [menu, durum, sekmeCubugu];
+const odaktaGizlenenler = [menu, durum];
 
 function odakModu() {
   odaktaGizlenenler.forEach((oge) => oge.classList.add("gizli"));

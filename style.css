@@ -1,6 +1,7 @@
 /* Renkler: karanlık tema (varsayılan) */
 :root {
   --arka: #0f0f10;
+  --serit: #0a0a0b;
   --yazi: #d9d7d2;
   --soluk: #3d3d40;
   --ikincil: #6b6b70;
@@ -16,6 +17,7 @@
 /* Renkler: aydınlık tema */
 :root.aydinlik {
   --arka: #f6f4ef;
+  --serit: #ebe8e1;
   --yazi: #2a2926;
   --soluk: #c4bfb5;
   --ikincil: #8f8a80;
@@ -61,7 +63,7 @@ html, body {
   width: 100%;
   height: 100vh;
   height: 100dvh;
-  padding: max(10vh, calc(3vh + 56px)) 110px 12vh 6vw;
+  padding: calc(46px + 7vh) 110px 12vh 6vw;
   background: transparent;
   color: var(--yazi);
   caret-color: var(--yazi);
@@ -83,17 +85,19 @@ html, body {
   font-style: italic;
 }
 
-/* Üst sekme çubuğu: altından kayan yazı arka plana doğru silinir */
+/* Üst sekme şeridi: tarayıcı sekmeleri gibi, açık sekme alttaki sayfayla birleşir */
 #sekmeler {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  height: 46px;
   display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 3vh 110px 12px 6vw;
-  background: linear-gradient(var(--arka) 75%, transparent);
+  align-items: flex-end;
+  padding: 0 24px 0 6vw;
+  background: var(--serit);
+  /* Alt çizgi: kenarlık değil iç gölge, böylece açık sekme üstünü örtebilir */
+  box-shadow: inset 0 -1px var(--cizgi);
   overflow-x: auto;
   scrollbar-width: none;
   animation: belir 0.9s 0.1s ease backwards;
@@ -103,26 +107,44 @@ html, body {
   display: none;
 }
 
-#sekmeler.gizli {
-  opacity: 0;
-  pointer-events: none;
-}
-
 .sekme {
+  position: relative;
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-  border-radius: 8px;
+  flex: 0 1 200px;
+  min-width: 120px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 9px 9px 0 0;
   color: var(--ikincil);
   transition: background-color 0.2s, color 0.2s;
 }
 
+/* Sekmeler arası ince dikey ayraç (açık sekmenin iki yanında görünmez) */
+.sekme + .sekme::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: var(--cizgi);
+}
+
+.sekme.aktif::before,
+.sekme.aktif + .sekme::before {
+  opacity: 0;
+}
+
 .sekme:hover {
+  background: var(--vurgu);
   color: var(--yazi);
 }
 
 .sekme.aktif {
-  background: var(--vurgu);
+  background: var(--arka);
+  border-color: var(--cizgi);
   color: var(--yazi);
 }
 
@@ -142,8 +164,11 @@ html, body {
 }
 
 .sekme-adi {
-  max-width: 180px;
-  padding: 6px 12px;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 6px 0 14px;
+  text-align: left;
   font-size: calc(12px * var(--olcek, 1));
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -154,32 +179,28 @@ html, body {
 .sekme-kapat {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  margin: 0 6px 0 -8px;
-  border-radius: 5px;
-  opacity: 0;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  border-radius: 6px;
+  opacity: 0.6;
   transition: opacity 0.2s, background-color 0.2s;
 }
 
-/* × sadece üstüne gelince ve aktif sekmede görünür */
-.sekme:hover .sekme-kapat,
-.sekme.aktif .sekme-kapat,
-.sekme.onay .sekme-kapat,
-.sekme-kapat:focus-visible {
-  opacity: 1;
-}
-
 .sekme-kapat:hover {
+  opacity: 1;
   background: var(--vurgu);
 }
 
 #sekmeEkle {
+  position: relative;
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
+  margin: 0 0 3px 6px;
   border-radius: 8px;
   color: var(--ikincil);
   transition: background-color 0.2s, color 0.2s;
@@ -383,12 +404,17 @@ html, body {
 /* Dar ekran (telefon): menü alta, yatay */
 @media (max-width: 640px) {
   #not {
-    padding: calc(3vh + 56px) 7vw 120px;
+    padding: calc(46px + 5vh) 7vw 120px;
     font-size: 16px;
   }
 
   #sekmeler {
-    padding: 3vh 7vw 12px;
+    padding: 0 8px;
+  }
+
+  .sekme {
+    flex-basis: 150px;
+    min-width: 110px;
   }
 
   #menu {
