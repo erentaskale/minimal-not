@@ -63,7 +63,7 @@ html, body {
   width: 100%;
   height: 100vh;
   height: 100dvh;
-  padding: calc(46px + 7vh) 110px 12vh 6vw;
+  padding: calc(42px + 7vh) 110px 12vh 6vw;
   background: transparent;
   color: var(--yazi);
   caret-color: var(--yazi);
@@ -91,9 +91,9 @@ html, body {
   top: 0;
   left: 0;
   right: 0;
-  height: 46px;
+  height: 42px;
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   padding: 0 24px 0 0;
   background: var(--serit);
   /* Alt çizgi: kenarlık değil iç gölge, böylece açık sekme üstünü örtebilir */
@@ -113,10 +113,9 @@ html, body {
   align-items: center;
   flex: 0 1 200px;
   min-width: 120px;
-  height: 36px;
-  border: 1px solid transparent;
-  border-bottom: none;
-  border-radius: 9px 9px 0 0;
+  /* Şeridin tamamını doldurur, üstte boşluk kalmaz */
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
   color: var(--ikincil);
   transition: background-color 0.2s, color 0.2s;
 }
@@ -124,7 +123,6 @@ html, body {
 /* İlk sekme ekranın sol kenarına yaslanır */
 .sekme:first-child {
   border-left: none;
-  border-top-left-radius: 0;
 }
 
 /* Sekmeler arası ince dikey ayraç (açık sekmenin iki yanında görünmez) */
@@ -206,7 +204,8 @@ html, body {
   flex-shrink: 0;
   width: 30px;
   height: 30px;
-  margin: 0 0 3px 6px;
+  align-self: center;
+  margin-left: 6px;
   border-radius: 8px;
   color: var(--ikincil);
   transition: background-color 0.2s, color 0.2s;
@@ -410,7 +409,7 @@ html, body {
 /* Dar ekran (telefon): menü alta, yatay */
 @media (max-width: 640px) {
   #not {
-    padding: calc(46px + 5vh) 7vw 120px;
+    padding: calc(42px + 5vh) 7vw 120px;
     font-size: 16px;
   }
 
