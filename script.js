@@ -131,6 +131,164 @@ function sayaciGuncelle() {
   sayac.textContent = kelime + " kelime · " + metin.length + " karakter";
 }
 
+// Notun ilk dolu satırı: sekme adı ve dosya adı buradan çıkar
+function ilkSatir(metin, uzunluk) {
+  const satir = metin.split("\n").find((s) => s.trim()) || "";
+  return satir
+    .replace(/^#+\s*/, "")
+    .replace(/[\\/:*?"<>|]/g, "")
+    .trim()
+    .slice(0, uzunluk)
+    .trim();
+}
+
+// Sekmeler: her sekme ayrı bir not tutar, hepsi tek anahtarda JSON olarak saklanır
+const sekmeCubugu = document.getElementById("sekmeler");
+let sekmeler = [];
+let aktifId = null;
+
+function yeniSekme() {
+  return { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), metin: "" };
+}
+
+function sekmeleriYukle() {
+  try {
+    sekmeler = JSON.parse(oku("sekmeler")) || [];
+  } catch (e) {
+    sekmeler = [];
+  }
+  if (!Array.isArray(sekmeler)) sekmeler = [];
+
+  // Sekmeli sürümden önce yazılmış tek not ilk sekmeye taşınır
+  if (!sekmeler.length) sekmeler.push({ ...yeniSekme(), metin: oku("not") || "" });
+
+  aktifId = oku("aktifSekme");
+  if (!sekmeler.some((s) => s.id === aktifId)) aktifId = sekmeler[0].id;
+}
+
+function aktifSekme() {
+  return sekmeler.find((s) => s.id === aktifId);
+}
+
+// Ekrandaki yazıyı, imleci ve kaydırmayı aktif sekmeye işle
+function aktifiGuncelle() {
+  const sekme = aktifSekme();
+  sekme.metin = not.value;
+  sekme.imlec = not.selectionStart;
+  sekme.kaydirma = not.scrollTop;
+}
+
+function sekmeleriKaydet() {
+  return yaz("sekmeler", JSON.stringify(sekmeler)) && yaz("aktifSekme", aktifId);
+}
+
+// Aktif sekmenin notunu yazı alanına koy, imleç ve kaydırma kaldığı yerden
+function notuGoster() {
+  const sekme = aktifSekme();
+  not.value = sekme.metin;
+  const imlec = sekme.imlec ?? sekme.metin.length;
+  not.setSelectionRange(imlec, imlec);
+  not.focus({ preventScroll: true });
+  not.scrollTop = sekme.kaydirma ?? not.scrollHeight;
+  oranHesapla();
+  sayaciGuncelle();
+  silmeOnayiIptal();
+}
+
+function sekmeAc(id) {
+  if (id !== aktifId) {
+    clearTimeout(kayitZamanlayici);
+    aktifiGuncelle();
+    aktifId = id;
+    notuGoster();
+    sekmeleriKaydet();
+  }
+  sekmeleriCiz();
+  not.focus({ preventScroll: true });
+}
+
+function yeniSekmeAc() {
+  const sekme = yeniSekme();
+  sekmeler.push(sekme);
+  sekmeAc(sekme.id);
+}
+
+// Sekme kapatma: içi doluysa ilk basış onay ister, 3 sn içinde ikinci basış kapatır
+let kapatmaOnayi = null;
+
+function kapatmaOnayiIptal() {
+  if (!kapatmaOnayi) return;
+  clearTimeout(kapatmaOnayi.zamanlayici);
+  kapatmaOnayi = null;
+  sekmeleriCiz();
+}
+
+function sekmeKapat(id) {
+  const sekme = sekmeler.find((s) => s.id === id);
+  const metin = id === aktifId ? not.value : sekme.metin;
+
+  if (metin.trim() && kapatmaOnayi?.id !== id) {
+    kapatmaOnayiIptal();
+    kapatmaOnayi = { id, zamanlayici: setTimeout(kapatmaOnayiIptal, 3000) };
+    sekmeleriCiz();
+    bildir("Kapatmak için tekrar bas · not silinir");
+    return;
+  }
+
+  kapatmaOnayiIptal();
+  const sira = sekmeler.indexOf(sekme);
+  sekmeler.splice(sira, 1);
+  // Son sekme kapanınca yerine boş bir sekme açılır
+  if (!sekmeler.length) sekmeler.push(yeniSekme());
+  if (id === aktifId) {
+    clearTimeout(kayitZamanlayici);
+    aktifId = sekmeler[Math.min(sira, sekmeler.length - 1)].id;
+    notuGoster();
+  }
+  sekmeleriKaydet();
+  sekmeleriCiz();
+  not.focus({ preventScroll: true });
+}
+
+function sekmeleriCiz() {
+  sekmeCubugu.replaceChildren();
+
+  for (const sekme of sekmeler) {
+    const aktif = sekme.id === aktifId;
+    const kutu = document.createElement("div");
+    kutu.className = "sekme";
+    kutu.classList.toggle("aktif", aktif);
+    kutu.classList.toggle("onay", kapatmaOnayi?.id === sekme.id);
+
+    const ad = document.createElement("button");
+    ad.className = "sekme-adi";
+    ad.textContent = ilkSatir(aktif ? not.value : sekme.metin, 24) || "Yeni not";
+    ad.title = ad.textContent;
+    ad.addEventListener("click", () => sekmeAc(sekme.id));
+    kutu.append(ad);
+
+    const kapat = document.createElement("button");
+    kapat.className = "sekme-kapat";
+    kapat.title = "Sekmeyi kapat";
+    kapat.setAttribute("aria-label", "Sekmeyi kapat");
+    kapat.innerHTML = '<svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>';
+    kapat.addEventListener("click", () => sekmeKapat(sekme.id));
+    kutu.append(kapat);
+
+    sekmeCubugu.append(kutu);
+  }
+
+  const ekle = document.createElement("button");
+  ekle.id = "sekmeEkle";
+  ekle.title = "Yeni sekme";
+  ekle.setAttribute("aria-label", "Yeni sekme");
+  ekle.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg>';
+  ekle.addEventListener("click", yeniSekmeAc);
+  sekmeCubugu.append(ekle);
+
+  sekmeCubugu.querySelector(".aktif")?.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
 // Otomatik kayıt: yazmayı bırakınca not tarayıcıda saklanır
 let kayitZamanlayici;
 
@@ -138,20 +296,21 @@ function otomatikKaydet() {
   clearTimeout(kayitZamanlayici);
   kayitDurumu.textContent = "";
   kayitZamanlayici = setTimeout(() => {
-    if (yaz("not", not.value)) kayitDurumu.textContent = " · kaydedildi";
+    aktifiGuncelle();
+    if (sekmeleriKaydet()) kayitDurumu.textContent = " · kaydedildi";
+    sekmeleriCiz();
   }, 500);
 }
 
 // Odak modu: yazarken menü ve sayaç gizlenir, 1 sn durunca geri gelir
 let odakZamanlayici;
+const odaktaGizlenenler = [menu, durum];
 
 function odakModu() {
-  menu.classList.add("gizli");
-  durum.classList.add("gizli");
+  odaktaGizlenenler.forEach((oge) => oge.classList.add("gizli"));
   clearTimeout(odakZamanlayici);
   odakZamanlayici = setTimeout(() => {
-    menu.classList.remove("gizli");
-    durum.classList.remove("gizli");
+    odaktaGizlenenler.forEach((oge) => oge.classList.remove("gizli"));
   }, 1000);
 }
 
@@ -173,14 +332,7 @@ function bildir(mesaj) {
 
 // Dosya adı: ilk satır başlık olur, yoksa tarih kullanılır
 function dosyaAdi() {
-  const ilkSatir = not.value.split("\n").find((satir) => satir.trim()) || "";
-  const baslik = ilkSatir
-    .replace(/^#+\s*/, "")
-    .replace(/[\\/:*?"<>|]/g, "")
-    .trim()
-    .slice(0, 40)
-    .trim();
-  return baslik || "not-" + new Date().toISOString().slice(0, 10);
+  return ilkSatir(not.value, 40) || "not-" + new Date().toISOString().slice(0, 10);
 }
 
 // İndirme: notu dosyaya çevirip indir
@@ -371,12 +523,10 @@ document.getElementById("ses").addEventListener("click", () => {
   not.focus({ preventScroll: true });
 });
 
-// Açılış: kayıtlı notu geri yükle
-not.value = oku("not") || "";
-sayaciGuncelle();
-not.setSelectionRange(not.value.length, not.value.length);
-not.scrollTop = not.scrollHeight;
-oranHesapla();
+// Açılış: kayıtlı sekmeleri geri yükle
+sekmeleriYukle();
+notuGoster();
+sekmeleriCiz();
 
 // İlk çizimden sonra tema geçiş animasyonlarını aç
 requestAnimationFrame(() => {

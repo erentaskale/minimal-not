@@ -1,6 +1,7 @@
 /* Renkler: karanlık tema (varsayılan) */
 :root {
   --arka: #0f0f10;
+  --serit: #0a0a0b;
   --yazi: #d9d7d2;
   --soluk: #3d3d40;
   --ikincil: #6b6b70;
@@ -16,6 +17,7 @@
 /* Renkler: aydınlık tema */
 :root.aydinlik {
   --arka: #f6f4ef;
+  --serit: #ebe8e1;
   --yazi: #2a2926;
   --soluk: #c4bfb5;
   --ikincil: #8f8a80;
@@ -46,7 +48,8 @@ html, body {
 .hazir body,
 .hazir #not,
 .hazir #menu,
-.hazir #durum {
+.hazir #durum,
+.hazir #sekmeler {
   transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, opacity 0.4s ease, transform 0.4s ease;
 }
 
@@ -60,7 +63,7 @@ html, body {
   width: 100%;
   height: 100vh;
   height: 100dvh;
-  padding: 10vh 110px 12vh 6vw;
+  padding: calc(42px + 7vh) 110px 12vh 6vw;
   background: transparent;
   color: var(--yazi);
   caret-color: var(--yazi);
@@ -80,6 +83,161 @@ html, body {
 #not::placeholder {
   color: var(--soluk);
   font-style: italic;
+}
+
+/* Üst sekme şeridi: tarayıcı sekmeleri gibi, açık sekme alttaki sayfayla birleşir */
+#sekmeler {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 42px;
+  display: flex;
+  align-items: stretch;
+  padding: 0 24px 0 0;
+  background: var(--serit);
+  /* Alt çizgi: kenarlık değil iç gölge, böylece açık sekme üstünü örtebilir */
+  box-shadow: inset 0 -1px var(--cizgi);
+  overflow-x: auto;
+  scrollbar-width: none;
+  animation: belir 0.9s 0.1s ease backwards;
+}
+
+#sekmeler::-webkit-scrollbar {
+  display: none;
+}
+
+.sekme {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 1 200px;
+  min-width: 120px;
+  /* Şeridin tamamını doldurur, üstte boşluk kalmaz */
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-radius: 10px 10px 0 0;
+  color: var(--ikincil);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* İlk sekme ekranın sol kenarına yaslanır */
+.sekme:first-child {
+  border-left: none;
+  border-top-left-radius: 0;
+}
+
+/* Sekmeler arası ince dikey ayraç (açık sekmenin iki yanında görünmez) */
+.sekme + .sekme::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: var(--cizgi);
+}
+
+.sekme.aktif::before,
+.sekme.aktif + .sekme::before {
+  opacity: 0;
+}
+
+.sekme:hover {
+  background: var(--vurgu);
+  color: var(--yazi);
+}
+
+.sekme.aktif {
+  background: var(--arka);
+  border-color: var(--cizgi);
+  color: var(--yazi);
+}
+
+/* Kapatma onayı: silme butonundaki gibi kırmızı */
+.sekme.onay {
+  background: rgba(220, 70, 70, 0.14);
+  color: #e05252;
+}
+
+.sekme button,
+#sekmeEkle {
+  background: transparent;
+  color: inherit;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.sekme-adi {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 6px 0 14px;
+  text-align: left;
+  font-size: calc(12px * var(--olcek, 1));
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sekme-kapat {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  border-radius: 6px;
+  opacity: 0.6;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.sekme-kapat:hover {
+  opacity: 1;
+  background: var(--vurgu);
+}
+
+#sekmeEkle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  align-self: center;
+  margin-left: 6px;
+  border-radius: 8px;
+  color: var(--ikincil);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+#sekmeEkle:hover {
+  background: var(--vurgu);
+  color: var(--yazi);
+}
+
+.sekme button:focus-visible,
+#sekmeEkle:focus-visible {
+  outline: 1px solid var(--ikincil);
+}
+
+#sekmeler svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.sekme-kapat svg {
+  width: 12px;
+  height: 12px;
+}
+
+#sekmeEkle svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* Sağ menü */
@@ -253,8 +411,17 @@ html, body {
 /* Dar ekran (telefon): menü alta, yatay */
 @media (max-width: 640px) {
   #not {
-    padding: 7vh 7vw 120px;
+    padding: calc(42px + 5vh) 7vw 120px;
     font-size: 16px;
+  }
+
+  #sekmeler {
+    padding: 0;
+  }
+
+  .sekme {
+    flex-basis: 150px;
+    min-width: 110px;
   }
 
   #menu {
