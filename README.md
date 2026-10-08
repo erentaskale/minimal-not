@@ -38,3 +38,7 @@ Yukarıdaki linkten doğrudan kullanabilirsin. Bilgisayarında çalıştırmak i
 - HTML
 - CSS
 - JavaScript
+
+## Durum
+
+Proje aktif olarak geliştiriliyor.
