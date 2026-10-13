@@ -10,3 +10,6 @@ desktop.ini
 
 # Uygulamadan kaydedilen notlar (kişisel içerik GitHub'a gitmesin)
 *.txt
+
+# Claude ile kişisel çalışma notları
+CLAUDE.local.md
